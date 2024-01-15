@@ -9,7 +9,7 @@ services:
     networks:
       - opereplay-net
     environment:
-      POSTGRESQL_PASSWORD: 853e526a224c320d4349
+      POSTGRESQL_PASSWORD: change_me_pg_password
 
   redis:
     image: localhost:5000/bitnami/redis:6.0.12-debian-10-r33
@@ -95,12 +95,12 @@ services:
       PGPORT: 5432
       PGDATABASE: postgres
       PGUSER: postgres
-      PGPASSWORD: 853e526a224c320d4349
+      PGPASSWORD: change_me_pg_password
     entrypoint:
       - /bin/bash
       - -c
       - |
-        until PGPASSWORD=853e526a224c320d4349 psql -h postgresql -U postgres -d postgres -c '\q'; do
+        until PGPASSWORD=change_me_pg_password psql -h postgresql -U postgres -d postgres -c '\q'; do
         echo "PostgreSQL is unavailable - sleeping"
         sleep 1
         done
@@ -153,6 +153,8 @@ services:
   ender-openreplay:
     image: localhost:5000/p1t3u8a3/ender:v1.16.0
     container_name: ender
+    depends_on:
+      - postgresql
     networks:
       - opereplay-net
     env_file:
@@ -161,7 +163,7 @@ services:
 
   heuristics-openreplay:
     image: localhost:5000/p1t3u8a3/heuristics:v1.16.0
-    domainname: app.svc.cluster.local
+    # domainname: app.svc.cluster.local
     container_name: heuristics
     networks:
       opereplay-net:
@@ -228,6 +230,8 @@ services:
   chalice-openreplay:
     image: localhost:5000/p1t3u8a3/chalice:v1.16.0
     container_name: chalice
+    depends_on:
+      - postgresql
     volumes:
       - shared-volume:/mnt/efs
     networks:
@@ -281,7 +285,8 @@ services:
       - opereplay-net
     environment:
       - ACME_AGREE=true # Agree to Let's Encrypt Subscriber Agreement
-      - CADDY_DOMAIN=or-foss.rjsh.me
+      # - CADDY_DOMAIN=or-foss.rjsh.me
+      - CADDY_DOMAIN=change_me_domain
     restart: unless-stopped
 
 volumes:

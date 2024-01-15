@@ -28,7 +28,7 @@ type ComposeContent struct {
 func main() {
 	var content ComposeContent
 
-	viper.SetConfigName("docker-compose")
+	viper.SetConfigName("docker-compose.source")
 	viper.SetConfigType("yml")
 	viper.AddConfigPath(".")
 
