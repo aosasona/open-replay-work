@@ -50,20 +50,35 @@ func main() {
 	cmd := os.Args[1]
 	switch cmd {
 	case "generate":
-		generateFile(content)
-	case "run":
+		generateFile(content, true)
+	case "clone":
 		panic("not implemented!")
 	default:
 		log.Fatal("Command not recognised")
 	}
 }
 
-func generateFile(content ComposeContent) {
+func generateFile(content ComposeContent, joinAll bool) {
+	commands, count := makeCommands(content, joinAll)
+
+	commandsFile := must("open or create "+CommandsFileName+" file",
+		func() (*os.File, error) {
+			return os.OpenFile(CommandsFileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+		})
+
+	defer commandsFile.Close()
+
+	_, _ = commandsFile.Write([]byte(commands))
+
+	slog.Info("Finished generating redistribution commands", slog.Int("count", count))
+}
+
+func makeCommands(content ComposeContent, joinAll bool) (string, int) {
 	var (
 		ReplacementMap = map[string]string{
 			"nginx:latest":                 "nginx:latest",
 			"debian:stable-slim":           "debian:stable-slim",
-			"postgresql:14.5.0":            "postgresql:14.5.0",
+			"postgresql:14.5.0":            "bitnami/postgresql:14.5.0",
 			"caddy:latest":                 "caddy:latest",
 			"minio:2020.10.9-debian-10-r6": "bitnami/minio:2020.10.9-debian-10-r6",
 			"minio:2023.2.10-debian-11-r1": "bitnami/minio:2023.2.10-debian-11-r1",
@@ -79,34 +94,35 @@ func generateFile(content ComposeContent) {
 		imageParts := strings.Split(value.Image, "/")
 		imageName := imageParts[len(imageParts)-1]
 
-		localImageName := fmt.Sprintf("%s/%s", RegistryAddress, imageName)
-
 		// Some images are missing from the AWS gallery, we need to manually replace them with the docker hub alternative
 		remoteImageName := value.Image
 		if alt, ok := ReplacementMap[imageName]; ok {
 			remoteImageName = alt
 		}
 
+		// if the image name is something like bitnami/postgresql, keep that instead of just postgresql
+		if len(imageParts) > 2 {
+			lastIdx := len(imageParts) - 1
+			imageName = imageParts[lastIdx-1] + "/" + imageParts[lastIdx]
+		}
+
+		localImageName := fmt.Sprintf("%s/%s", RegistryAddress, imageName)
+
 		cmd := fmt.Sprintf(`docker pull %s && \
 docker tag %s %s && \
-docker push %s
-
-`, remoteImageName, remoteImageName, localImageName, localImageName)
+docker push %s`, remoteImageName, remoteImageName, localImageName, localImageName)
 
 		commands += cmd
+		if joinAll {
+			commands += " && \\"
+		} else {
+			commands += "\n\n"
+		}
+
 		count += 1
 	}
 
-	commandsFile := must("open or create "+CommandsFileName+" file",
-		func() (*os.File, error) {
-			return os.OpenFile(CommandsFileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
-		})
-
-	defer commandsFile.Close()
-
-	_, _ = commandsFile.Write([]byte(commands))
-
-	slog.Info("Finished generating redistribution commands", slog.Int("count", count))
+	return strings.Trim(commands, "&& \\"), count
 }
 
 func must[T any](text string, fn func() (T, error)) T {
