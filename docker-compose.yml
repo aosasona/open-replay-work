@@ -167,8 +167,8 @@ services:
     container_name: heuristics
     networks:
       opereplay-net:
-        aliases:
-          - heuristics-openreplay.app.svc.cluster.local
+        # aliases:
+        #   - heuristics-openreplay.app.svc.cluster.local
     env_file:
       - heuristics.env
     restart: unless-stopped
