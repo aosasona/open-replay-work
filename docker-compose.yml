@@ -2,7 +2,7 @@ version: "3"
 
 services:
   postgresql:
-    image: public.ecr.aws/bitnami/postgresql:14.5.0
+    image: localhost:5000/bitnami/postgresql:14.5.0
     container_name: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -12,7 +12,7 @@ services:
       POSTGRESQL_PASSWORD: 853e526a224c320d4349
 
   redis:
-    image: public.ecr.aws/bitnami/redis:6.0.12-debian-10-r33
+    image: localhost:5000/bitnami/redis:6.0.12-debian-10-r33
     container_name: redis
     volumes:
       - redisdata:/var/lib/postgresql/data
@@ -22,7 +22,7 @@ services:
       ALLOW_EMPTY_PASSWORD: "yes"
 
   minio:
-    image: public.ecr.aws/bitnami/minio:2023.2.10-debian-11-r1
+    image: localhost:5000/bitnami/minio:2023.2.10-debian-11-r1
     container_name: minio
     volumes:
       - miniodata:/bitnami/minio/data
@@ -35,7 +35,7 @@ services:
       MINIO_ROOT_PASSWORD: 3919b67ae92780e90bb0
 
   fs-permission:
-    image: public.ecr.aws/debian:stable-slim
+    image: localhost:5000/debian:stable-slim
     container_name: fs-permission
     profiles:
       - "migration"
@@ -50,7 +50,7 @@ services:
         chown -R 1001:1001 /mnt/{efs,minio,postgres}
 
   minio-migration:
-    image: public.ecr.aws/bitnami/minio:2020.10.9-debian-10-r6
+    image: localhost:5000/bitnami/minio:2020.10.9-debian-10-r6
     container_name: minio-migration
     profiles:
       - "migration"
@@ -79,7 +79,7 @@ services:
         bash /tmp/minio.sh init || exit 100
 
   db-migration:
-    image: public.ecr.aws/bitnami/postgresql:14.5.0
+    image: localhost:5000/bitnami/postgresql:14.5.0
     container_name: db-migration
     profiles:
       - "migration"
@@ -108,14 +108,14 @@ services:
         psql -v ON_ERROR_STOP=1 -f /tmp/init_schema.sql
 
   frontend-openreplay:
-    image: public.ecr.aws/p1t3u8a3/frontend:v1.16.0
+    image: localhost:5000/p1t3u8a3/frontend:v1.16.0
     container_name: frontend
     networks:
       - opereplay-net
     restart: unless-stopped
 
   alerts-openreplay:
-    image: public.ecr.aws/p1t3u8a3/alerts:v1.16.0
+    image: localhost:5000/p1t3u8a3/alerts:v1.16.0
     container_name: alerts
     networks:
       - opereplay-net
@@ -124,7 +124,7 @@ services:
     restart: unless-stopped
 
   assets-openreplay:
-    image: public.ecr.aws/p1t3u8a3/assets:v1.16.0
+    image: localhost:5000/p1t3u8a3/assets:v1.16.0
     container_name: assets
     networks:
       - opereplay-net
@@ -133,7 +133,7 @@ services:
     restart: unless-stopped
 
   assist-openreplay:
-    image: public.ecr.aws/p1t3u8a3/assist:v1.16.0
+    image: localhost:5000/p1t3u8a3/assist:v1.16.0
     container_name: assist
     networks:
       - opereplay-net
@@ -142,7 +142,7 @@ services:
     restart: unless-stopped
 
   db-openreplay:
-    image: public.ecr.aws/p1t3u8a3/db:v1.16.0
+    image: localhost:5000/p1t3u8a3/db:v1.16.0
     container_name: db
     networks:
       - opereplay-net
@@ -151,7 +151,7 @@ services:
     restart: unless-stopped
 
   ender-openreplay:
-    image: public.ecr.aws/p1t3u8a3/ender:v1.16.0
+    image: localhost:5000/p1t3u8a3/ender:v1.16.0
     container_name: ender
     networks:
       - opereplay-net
@@ -160,7 +160,7 @@ services:
     restart: unless-stopped
 
   heuristics-openreplay:
-    image: public.ecr.aws/p1t3u8a3/heuristics:v1.16.0
+    image: localhost:5000/p1t3u8a3/heuristics:v1.16.0
     domainname: app.svc.cluster.local
     container_name: heuristics
     networks:
@@ -172,7 +172,7 @@ services:
     restart: unless-stopped
 
   imagestorage-openreplay:
-    image: public.ecr.aws/p1t3u8a3/imagestorage:v1.16.0
+    image: localhost:5000/p1t3u8a3/imagestorage:v1.16.0
     container_name: imagestorage
     env_file:
       - imagestorage.env
@@ -181,7 +181,7 @@ services:
     restart: unless-stopped
 
   integrations-openreplay:
-    image: public.ecr.aws/p1t3u8a3/integrations:v1.16.0
+    image: localhost:5000/p1t3u8a3/integrations:v1.16.0
     container_name: integrations
     networks:
       - opereplay-net
@@ -190,7 +190,7 @@ services:
     restart: unless-stopped
 
   peers-openreplay:
-    image: public.ecr.aws/p1t3u8a3/peers:v1.16.0
+    image: localhost:5000/p1t3u8a3/peers:v1.16.0
     container_name: peers
     networks:
       - opereplay-net
@@ -199,7 +199,7 @@ services:
     restart: unless-stopped
 
   sourcemapreader-openreplay:
-    image: public.ecr.aws/p1t3u8a3/sourcemapreader:v1.16.0
+    image: localhost:5000/p1t3u8a3/sourcemapreader:v1.16.0
     container_name: sourcemapreader
     networks:
       - opereplay-net
@@ -208,7 +208,7 @@ services:
     restart: unless-stopped
 
   videostorage-openreplay:
-    image: public.ecr.aws/p1t3u8a3/videostorage:v1.16.0
+    image: localhost:5000/p1t3u8a3/videostorage:v1.16.0
     container_name: videostorage
     networks:
       - opereplay-net
@@ -217,7 +217,7 @@ services:
     restart: unless-stopped
 
   http-openreplay:
-    image: public.ecr.aws/p1t3u8a3/http:v1.16.0
+    image: localhost:5000/p1t3u8a3/http:v1.16.0
     container_name: http
     networks:
       - opereplay-net
@@ -226,7 +226,7 @@ services:
     restart: unless-stopped
 
   chalice-openreplay:
-    image: public.ecr.aws/p1t3u8a3/chalice:v1.16.0
+    image: localhost:5000/p1t3u8a3/chalice:v1.16.0
     container_name: chalice
     volumes:
       - shared-volume:/mnt/efs
@@ -237,7 +237,7 @@ services:
     restart: unless-stopped
 
   sink-openreplay:
-    image: public.ecr.aws/p1t3u8a3/sink:v1.16.0
+    image: localhost:5000/p1t3u8a3/sink:v1.16.0
     container_name: sink
     volumes:
       - shared-volume:/mnt/efs
@@ -248,7 +248,7 @@ services:
     restart: unless-stopped
 
   storage-openreplay:
-    image: public.ecr.aws/p1t3u8a3/storage:v1.16.0
+    image: localhost:5000/p1t3u8a3/storage:v1.16.0
     container_name: storage
     volumes:
       - shared-volume:/mnt/efs
@@ -259,7 +259,7 @@ services:
     restart: unless-stopped
 
   nginx-openreplay:
-    image: public.ecr.aws/nginx:latest
+    image: localhost:5000/nginx:latest
     container_name: nginx
     networks:
       - opereplay-net
@@ -268,7 +268,7 @@ services:
     restart: unless-stopped
 
   caddy:
-    image: public.ecr.aws/caddy:latest
+    image: localhost:5000/caddy:latest
     container_name: caddy
     ports:
       - "80:80"
