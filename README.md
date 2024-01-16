@@ -12,7 +12,7 @@
 ## Start the docker registry
 
 ```bash
-docker compose -f docker-compose.registry.yml
+docker compose -f docker-compose.registry.yml up
 ```
 
 This starts a local docker registry and binds the volume to `~/registry-data/` for persistence across restarts.
